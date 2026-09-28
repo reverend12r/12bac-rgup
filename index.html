@@ -271,7 +271,10 @@
             }
         };
 
+        // Инициализация локальных хранилищ
         let tasks = JSON.parse(localStorage.getItem('student_planner_tasks')) || [];
+        let lessonNotes = JSON.parse(localStorage.getItem('student_planner_lesson_notes')) || {};
+        
         let currentDate = new Date();
         let selectedDateStr = formatDateISO(new Date());
         let weekOffset = 0; 
@@ -297,6 +300,63 @@
         }
 
         function saveTasks() { localStorage.setItem('student_planner_tasks', JSON.stringify(tasks)); }
+        function saveNotes() { localStorage.setItem('student_planner_lesson_notes', JSON.stringify(lessonNotes)); }
+
+        // Функции для активации и сохранения заметки к паре
+        function editLessonNote(key) {
+            // Скрываем блок просмотра
+            document.getElementById(`note-view-${key}`).classList.add('hidden');
+            document.getElementById(`note-view-${key}`).classList.remove('flex');
+            
+            // Показываем поле ввода
+            const editDiv = document.getElementById(`note-edit-${key}`);
+            editDiv.classList.remove('hidden');
+            editDiv.classList.add('flex');
+            
+            // Фокусируемся на вводе и ставим курсор в конец
+            const input = document.getElementById(`note-input-${key}`);
+            input.focus();
+            const val = input.value;
+            input.value = '';
+            input.value = val;
+        }
+
+        function saveLessonNote(key) {
+            const input = document.getElementById(`note-input-${key}`);
+            if (!input) return;
+            
+            const val = input.value.trim();
+            if (val) {
+                lessonNotes[key] = val;
+            } else {
+                delete lessonNotes[key]; // Если стерли текст, удаляем заметку
+            }
+            saveNotes(); // Сохраняем в localStorage
+
+            // Обновляем визуальный блок
+            const viewDiv = document.getElementById(`note-view-${key}`);
+            const textSpan = document.getElementById(`note-text-${key}`);
+            const icon = viewDiv.querySelector('i');
+
+            if (val) {
+                textSpan.innerText = val;
+                textSpan.className = "text-xs text-amber-900 font-medium flex-1 break-words";
+                viewDiv.className = "flex items-start gap-2 cursor-pointer transition-all bg-amber-50/60 border border-amber-200/50 p-2 rounded-lg hover:bg-amber-100/50";
+                icon.className = "fa-solid fa-thumbtack text-amber-500 mt-0.5 text-[10px] shrink-0";
+            } else {
+                textSpan.innerText = "Добавить заметку / ДЗ...";
+                textSpan.className = "text-xs text-gray-500 flex-1 break-words";
+                viewDiv.className = "flex items-start gap-2 cursor-pointer transition-all p-1 opacity-50 hover:opacity-100";
+                icon.className = "fa-solid fa-pen text-gray-400 mt-0.5 text-[10px] shrink-0";
+            }
+
+            // Прячем поле ввода и показываем блок просмотра
+            document.getElementById(`note-edit-${key}`).classList.add('hidden');
+            document.getElementById(`note-edit-${key}`).classList.remove('flex');
+            
+            viewDiv.classList.remove('hidden');
+            viewDiv.classList.add('flex');
+        }
 
         function getTargetWeekDate() {
             const d = new Date();
@@ -487,6 +547,10 @@
                         const isLecture = item.type === "Лекция";
                         const badgeColor = isLecture ? 'bg-amber-100 text-amber-800' : 'bg-indigo-50 text-indigo-700';
 
+                        // Формируем уникальный ключ для заметки
+                        const noteKey = `${thisDayISO}_${item.num}`;
+                        const savedNote = lessonNotes[noteKey] ? escapeHtml(lessonNotes[noteKey]) : '';
+
                         lessonsHtml += `
                             <div id="card-day-${dayNum}-lesson-${item.num}" class="lesson-card p-3.5 border-b border-gray-100 last:border-b-0 transition-all">
                                 <div class="flex justify-between items-start">
@@ -503,6 +567,23 @@
                                     <div class="flex flex-col items-end gap-1 shrink-0 ml-2">
                                         <span class="text-[10px] font-bold px-2 py-0.5 rounded ${badgeColor}">${item.type}</span>
                                         <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2 py-0.5 rounded-md mt-0.5">Ауд. ${item.room}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Click-to-Edit Заметка -->
+                                <div id="note-container-${noteKey}" class="mt-2.5 transition-all">
+                                    <!-- Режим просмотра (нажми, чтобы редактировать) -->
+                                    <div id="note-view-${noteKey}" class="flex items-start gap-2 cursor-pointer transition-all ${savedNote ? 'bg-amber-50/60 border border-amber-200/50 p-2 rounded-lg hover:bg-amber-100/50' : 'p-1 opacity-50 hover:opacity-100'}" onclick="editLessonNote('${noteKey}')">
+                                        <i class="fa-solid ${savedNote ? 'fa-thumbtack text-amber-500 mt-0.5' : 'fa-pen text-gray-400 mt-0.5'} text-[10px] shrink-0"></i>
+                                        <span id="note-text-${noteKey}" class="text-xs ${savedNote ? 'text-amber-900 font-medium' : 'text-gray-500'} flex-1 break-words">
+                                            ${savedNote ? savedNote : 'Добавить заметку / ДЗ...'}
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Режим редактирования (скрыт по умолчанию) -->
+                                    <div id="note-edit-${noteKey}" class="hidden bg-white rounded-lg border border-indigo-400 p-2 items-center gap-2 shadow-sm ring-2 ring-indigo-100">
+                                        <i class="fa-solid fa-pen text-indigo-400 text-[10px] shrink-0"></i>
+                                        <input type="text" id="note-input-${noteKey}" value="${savedNote}" placeholder="Записать ДЗ или дедлайн..." class="flex-1 bg-transparent text-xs text-gray-700 focus:outline-none placeholder-gray-400 w-full" onblur="saveLessonNote('${noteKey}')" onkeydown="if(event.key === 'Enter') this.blur()">
                                     </div>
                                 </div>
                             </div>
@@ -555,14 +636,13 @@
         function updateClockAndLiveStatus() {
             const now = new Date();
             const currentMins = now.getHours() * 60 + now.getMinutes();
-            const todayDay = now.getDay(); // 1 = Пн, 2 = Вт, ..., 5 = Пт, 0 = Вс, 6 = Сб
+            const todayDay = now.getDay(); 
             
             const timeTextEl = document.getElementById('current-time-text');
             if (timeTextEl) timeTextEl.innerText = now.toLocaleTimeString('ru-RU');
 
             let activePairNum = null;
 
-            // Плашка работает строго в будние дни (Понедельник — Пятница)
             if (todayDay >= 1 && todayDay <= 5) {
                 bells.forEach(pair => {
                     const startMins = timeToMinutes(pair.start);
@@ -573,7 +653,6 @@
                 });
             }
 
-            // Обновляем статус в разделе "Звонки"
             for (let i = 1; i <= 7; i++) {
                 const bellRow = document.getElementById(`bell-row-${i}`);
                 if (bellRow) {
@@ -591,7 +670,6 @@
                 }
             }
 
-            // Обновляем карточки в расписании текущей недели
             document.querySelectorAll('.lesson-card').forEach(card => {
                 const isCurrentDayCard = (weekOffset === 0) && card.id.startsWith(`card-day-${todayDay}-`);
                 const badge = card.querySelector('.badge-live');
