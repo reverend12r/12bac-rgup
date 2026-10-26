@@ -11,39 +11,37 @@
         try { document.documentElement.dataset.theme = localStorage.getItem('student_planner_theme') || 'auto'; }
         catch (e) { document.documentElement.dataset.theme = 'auto'; }
 
-        // Фавикон: будильник («звонки»), стрелки которого складываются в галочку («задачи»).
-        // Цвета берутся из темы: [начало градиента, конец, свечение и колокольчики, цвет стрелок]
+        // Фавикон — тот же значок, что в «О приложении»: белая шапочка выпускника
+        // на градиенте шапки текущей темы. [три цвета градиента, свечение, его прозрачность]
         const faviconPalettes = {
-            auto:     ['#3a2fc4', '#7a4ff0', '#ffb347', '#4b3fd6'],
-            light:    ['#3a2fc4', '#7a4ff0', '#ffb347', '#4b3fd6'],
-            dark:     ['#231c7a', '#5a33c4', '#ff963c', '#3b2aa8'],
-            neon:     ['#ff2bd6', '#00c8ff', '#f9f871', '#7b2bff'],
-            aurora:   ['#1e1b4b', '#134e4a', '#5eead4', '#1e1b4b'],
-            terminal: ['#021407', '#0a4a22', '#39ff78', '#04220d'],
-            forest:   ['#0f3d2a', '#2f7a4a', '#f0c85a', '#0f3d2a'],
-            sunset:   ['#ff5e62', '#ffb347', '#fff096', '#c2304a'],
-            ocean:    ['#023e8a', '#00b4d8', '#90e0ef', '#0063a0'],
-            sakura:   ['#f78fb3', '#b46ad8', '#fff3c4', '#b8366b']
+            light:    ['#3a2fc4', '#5a3fe0', '#7a4ff0', '#ffb347', .55],
+            dark:     ['#231c7a', '#3b2aa8', '#5a33c4', '#ff963c', .35],
+            neon:     ['#ff2bd6', '#7b2bff', '#00c8ff', '#f9f871', .35],
+            aurora:   ['#0f172a', '#1e1b4b', '#134e4a', '#5eead4', .55],
+            terminal: ['#021407', '#06301a', '#0a4a22', '#39ff78', .3],
+            forest:   ['#0f3d2a', '#1d5a3a', '#2f7a4a', '#f0c85a', .45],
+            sunset:   ['#ff5e62', '#ff7a59', '#ffb347', '#fff096', .5],
+            ocean:    ['#023e8a', '#0077b6', '#00b4d8', '#90e0ef', .55],
+            sakura:   ['#f78fb3', '#e86a9a', '#b46ad8', '#ffffff', .45]
         };
+        // Иконка graduation-cap из Font Awesome Free 6.4.0 (CC BY 4.0), сетка 640×512
+        const capPath = 'M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z';
         function applyFavicon(theme) {
-            const [c1, c2, glow, hand] = faviconPalettes[theme] || faviconPalettes.auto;
+            if (theme === 'auto') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const [c1, c2, c3, glow, glowOpacity] = faviconPalettes[theme] || faviconPalettes.light;
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                 <defs>
-                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
-                    <radialGradient id="s" cx="1" cy="0" r="1"><stop offset="0" stop-color="${glow}" stop-opacity=".75"/><stop offset=".6" stop-color="${glow}" stop-opacity="0"/></radialGradient>
+                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></linearGradient>
+                    <radialGradient id="s" cx="1" cy="0" r=".75"><stop offset="0" stop-color="${glow}" stop-opacity="${glowOpacity}"/><stop offset="1" stop-color="${glow}" stop-opacity="0"/></radialGradient>
                 </defs>
                 <rect width="64" height="64" rx="16" fill="url(#g)"/>
                 <rect width="64" height="64" rx="16" fill="url(#s)"/>
-                <path d="M9.5 22.5a10 10 0 0 1 14-14z" fill="${glow}"/>
-                <path d="M54.5 22.5a10 10 0 0 0-14-14z" fill="${glow}"/>
-                <path d="M19 52l-3.5 4.5M45 52l3.5 4.5" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-                <circle cx="32" cy="35" r="20" fill="#fff"/>
-                <g fill="${hand}" opacity=".3"><circle cx="32" cy="20" r="2"/><circle cx="47" cy="35" r="2"/><circle cx="32" cy="50" r="2"/><circle cx="17" cy="35" r="2"/></g>
-                <path d="M23.5 35.5l6.5 6.5 12.5-14" fill="none" stroke="${hand}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path fill="#fff" transform="translate(14 17.6) scale(.05625)" d="${capPath}"/>
             </svg>`;
             document.getElementById('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(svg);
         }
         applyFavicon(document.documentElement.dataset.theme);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyFavicon(document.documentElement.dataset.theme));
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
