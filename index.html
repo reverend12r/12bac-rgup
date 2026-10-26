@@ -1265,6 +1265,9 @@
 
         /* Смена темы: новая тема раскрывается кругом из точки нажатия */
         ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+        /* Пока раскрывается новая тема, цвета не плавно перетекают, а сразу встают на место:
+           иначе десятки переходов background/color перерисовываются в каждом кадре круга */
+        html.theme-switching *, html.theme-switching *::before, html.theme-switching *::after { transition: none !important; }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -2156,7 +2159,7 @@
         function renderThemes() {
             const current = getTheme();
             document.getElementById('theme-grid').innerHTML = themes.map(t => `
-                <button class="theme-card ${t.id === current ? 'selected' : ''}" onclick="setTheme('${t.id}', event)" aria-pressed="${t.id === current}">
+                <button class="theme-card ${t.id === current ? 'selected' : ''}" data-id="${t.id}" onclick="setTheme('${t.id}', event)" aria-pressed="${t.id === current}">
                     <span class="theme-check"><i class="fa-solid fa-check"></i></span>
                     ${t.id === 'auto'
                         ? `<div class="mock-wrap">${mockHtml('light')}${mockHtml('dark', 'mock-over')}</div>`
@@ -2176,7 +2179,21 @@
             document.querySelector('meta[name="theme-color"]').setAttribute('content', t ? t.color : '#4b3fd6');
             applyFavicon(id);
             syncSystemBars();
-            renderThemes();
+            updateThemeSelection();
+        }
+
+        // Карточки тем строим один раз, при смене темы только переставляем отметку
+        function updateThemeSelection() {
+            const grid = document.getElementById('theme-grid');
+            if (!grid.children.length) { renderThemes(); return; }
+            const current = getTheme();
+            grid.querySelectorAll('.theme-card').forEach(card => {
+                const on = card.dataset.id === current;
+                card.classList.toggle('selected', on);
+                card.setAttribute('aria-pressed', on);
+            });
+            const cur = themes.find(t => t.id === current);
+            document.getElementById('theme-current').textContent = cur ? cur.name : '';
         }
 
         // С event (клик по карточке) новая тема расходится кругом от пальца
@@ -2185,15 +2202,18 @@
                 applyTheme(id);
                 return;
             }
+            const root = document.documentElement;
             const x = event.clientX, y = event.clientY;
             const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+            root.classList.add('theme-switching');
             const transition = document.startViewTransition(() => applyTheme(id));
             transition.ready.then(() => {
-                document.documentElement.animate(
+                root.animate(
                     { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-                    { duration: 650, easing: 'cubic-bezier(.22, 1, .36, 1)', pseudoElement: '::view-transition-new(root)' }
+                    { duration: 600, easing: 'cubic-bezier(.4, 0, .2, 1)', pseudoElement: '::view-transition-new(root)' }
                 );
             }).catch(() => {});
+            transition.finished.finally(() => root.classList.remove('theme-switching'));
         }
 
         function switchStudyTab(tab) {
