@@ -1,0 +1,30 @@
+Copyright (c) 2026 reverend12r. All rights reserved.
+
+== Русский ==
+
+Сайт «Планер студента» (12 группа, КФ РГУП) и приложение для Android
+в этом репозитории защищены авторским правом.
+
+Без предварительного письменного разрешения автора запрещается копировать,
+изменять, распространять, публиковать или выдавать за своё исходный код,
+дизайн, темы оформления и другие материалы — целиком или частично.
+
+Разрешено: пользоваться сайтом и устанавливать приложение по назначению.
+
+== English ==
+
+The "Планер студента" website and Android app in this repository are protected
+by copyright.
+
+No permission is granted to copy, modify, distribute, publish or present as
+your own the source code, design, themes or other materials, in whole or in
+part, without the author's prior written permission.
+
+Permitted: using the website and installing the app for their intended purpose.
+
+== Сторонние компоненты / Third-party components ==
+
+Распространяются по своим лицензиям / Distributed under their own licenses:
+- Font Awesome Free 6.4.0 — icons CC BY 4.0, fonts SIL OFL 1.1, code MIT
+  (https://fontawesome.com/license/free)
+- Fonts Unbounded, Onest, JetBrains Mono, Press Start 2P — SIL Open Font License 1.1
