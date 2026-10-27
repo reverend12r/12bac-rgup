@@ -22,7 +22,8 @@ forest:   ['#0f3d2a', '#1d5a3a', '#2f7a4a', '#f0c85a', .45],
 sunset:   ['#ff5e62', '#ff7a59', '#ffb347', '#fff096', .5],
 ocean:    ['#023e8a', '#0077b6', '#00b4d8', '#90e0ef', .55],
 sakura:   ['#f78fb3', '#e86a9a', '#b46ad8', '#ffffff', .45],
-mitten:   ['#0b0b0b', '#0b0b0b', '#0b0b0b', '#ffffff', 0, 0]
+mitten:   ['#0b0b0b', '#0b0b0b', '#0b0b0b', '#ffffff', 0, 0],
+tsuki:    ['#2a3233', '#14191a', '#050606', '#9be8e0', .3, 6]
 };
 const capPath = 'M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z';
 function applyFavicon(theme) {
@@ -48,7 +49,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Press+Start+2P&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
 :root, [data-theme="light"], [data-theme="auto"] {
@@ -455,6 +456,97 @@ opacity: .8;
 .mock[data-theme="mitten"] .mock-hero i + i { background: #0b0b0b; }
 .mock[data-theme="mitten"] .mock-hero {
 background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .14) 0 1px, transparent 1px 3px), var(--hero);
+}
+[data-theme="tsuki"] {
+color-scheme: dark;
+--display: 'Playfair Display', 'Times New Roman', serif;
+--hero: linear-gradient(125deg, #2a3233 0%, #121617 45%, #050606 75%, #1d2425 100%);
+--hero-glow-a: rgba(155, 232, 224, .16);
+--hero-glow-b: rgba(0, 0, 0, .5);
+--week-b: radial-gradient(circle, #0c0e0f 1.6px, transparent 2px) 0 0 / 6px 6px, #d9f2f0;
+--tab-active-bg: #e6efee;
+--tab-active-fg: #0c0e0f;
+--on-accent: #0c0e0f;
+--on-live: #0c0e0f;
+--bg: #0c0e0f;
+--bg-2: #060707;
+--surface: #131617;
+--surface-2: #1b1f20;
+--ink: #e6efee;
+--ink-2: #b9c6c5;
+--muted: #7b8888;
+--line: rgba(200, 235, 235, .09);
+--line-2: rgba(200, 235, 235, .2);
+--accent: #d9f2f0;
+--accent-2: #8fb8b6;
+--accent-soft: rgba(190, 235, 232, .1);
+--accent-ink: #f2fbfa;
+--lecture: #f2f2f2;
+--lecture-soft: rgba(255, 255, 255, .1);
+--seminar: #7fb3b0;
+--seminar-soft: rgba(127, 179, 176, .13);
+--sun: #c9d6d5;
+--sun-soft: rgba(201, 214, 213, .1);
+--sun-ink: #e9f1f0;
+--live: #9be8e0;
+--live-soft: rgba(155, 232, 224, .12);
+--shadow-sm: none;
+--shadow: 0 14px 30px -18px rgba(0, 0, 0, .9);
+--shadow-lg: 0 20px 50px -20px rgba(0, 0, 0, .95);
+--r-lg: 6px;
+--r-md: 5px;
+--r-sm: 4px;
+}
+[data-theme="tsuki"] .app::after {
+content: ""; position: absolute; inset: 0; z-index: 60; pointer-events: none;
+opacity: .07;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="tsuki"] .header { border-radius: 0 0 6px 6px; }
+[data-theme="tsuki"] .header::after {
+background-image: radial-gradient(circle, rgba(225, 245, 243, .55) 1.3px, transparent 1.8px);
+background-size: 6px 6px;
+-webkit-mask-image: linear-gradient(105deg, transparent 38%, #000 92%);
+mask-image: linear-gradient(105deg, transparent 38%, #000 92%);
+}
+[data-theme="tsuki"] .header::before {
+content: ""; position: absolute; inset: 0; pointer-events: none;
+background:
+linear-gradient(94deg, transparent 0 22%, rgba(255, 255, 255, .13) 22.1% 22.25%, transparent 22.4%),
+linear-gradient(88deg, transparent 0 63%, rgba(255, 255, 255, .09) 63.1% 63.2%, transparent 63.3%),
+linear-gradient(176deg, transparent 0 70%, rgba(255, 255, 255, .07) 70.2% 70.35%, transparent 70.5%);
+}
+[data-theme="tsuki"] .header-row::after {
+content: "月が綺麗ですね";
+position: absolute; right: 118px; top: -8px;
+writing-mode: vertical-rl; white-space: nowrap;
+font-family: 'Yu Mincho', 'Hiragino Mincho ProN', 'Noto Serif CJK JP', 'Noto Serif JP', 'MS Mincho', serif;
+font-size: 10px; letter-spacing: .2em; line-height: 1;
+color: rgba(230, 245, 243, .55);
+pointer-events: none;
+}
+[data-theme="tsuki"] .header h1 { font-weight: 700; font-size: 27px; letter-spacing: .01em; }
+[data-theme="tsuki"] .eyebrow .dot { background: #9be8e0; box-shadow: 0 0 0 3px rgba(155, 232, 224, .2); }
+[data-theme="tsuki"] .clock { background: rgba(0, 0, 0, .35); border-color: rgba(220, 240, 240, .2); }
+[data-theme="tsuki"] .now::after {
+content: "月";
+position: absolute; right: -8px; bottom: -34px;
+font-family: 'Yu Mincho', 'Hiragino Mincho ProN', 'Noto Serif CJK JP', 'Noto Serif JP', 'MS Mincho', serif;
+font-size: 120px; line-height: 1;
+color: rgba(220, 240, 240, .05);
+pointer-events: none;
+}
+[data-theme="tsuki"] .now > * { position: relative; z-index: 1; }
+[data-theme="tsuki"] .week-letter { box-shadow: none; }
+[data-theme="tsuki"] .week-letter.b { color: #0c0e0f; text-shadow: 0 0 3px #d9f2f0, 0 0 6px #d9f2f0; }
+[data-theme="tsuki"] .now-progress > span { background: linear-gradient(90deg, #7fb3b0, #e6efee); }
+[data-theme="tsuki"] .nav-ink, [data-theme="tsuki"] .add-btn, [data-theme="tsuki"] .btn-primary,
+[data-theme="tsuki"] .cal-day.selected { box-shadow: none; }
+[data-theme="tsuki"] .about-logo { color: #e6efee; }
+.mock[data-theme="tsuki"] .mock-hero {
+background:
+radial-gradient(circle, rgba(225, 245, 243, .5) 1px, transparent 1.4px) 0 0 / 5px 5px,
+var(--hero);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body {
@@ -2209,7 +2301,8 @@ const themes = [
 { id: 'sunset',   name: 'Закат',     icon: 'fa-cloud-sun',          desc: 'Персик, коралл и слива',                   color: '#ff5e62' },
 { id: 'ocean',    name: 'Океан',     icon: 'fa-water',              desc: 'Глубокий синий и бирюза',                  color: '#0077b6' },
 { id: 'sakura',   name: 'Сакура',    icon: 'fa-spa',                desc: 'Нежно-розовый и лаванда',                  color: '#e86a9a' },
-{ id: 'mitten',   name: 'Пиксель',   icon: 'fa-chess-board',        desc: 'Монохром, пиксельный шрифт и сканлайны',     color: '#0b0b0b' }
+{ id: 'mitten',   name: 'Пиксель',   icon: 'fa-chess-board',        desc: 'Монохром, пиксельный шрифт и сканлайны',     color: '#0b0b0b' },
+{ id: 'tsuki',    name: 'Луна',      icon: 'fa-film',               desc: 'Чёрно-белый гранж, полутона и иероглифы',   color: '#0a0c0d' }
 ];
 function getTheme() { return document.documentElement.dataset.theme || 'auto'; }
 function mockHtml(id, extraClass = '') {
