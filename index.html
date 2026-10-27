@@ -26,10 +26,11 @@ mitten:   ['#0b0b0b', '#0b0b0b', '#0b0b0b', '#ffffff', 0, 0],
 tsuki:    ['#2a3233', '#14191a', '#050606', '#9be8e0', .3, 6]
 };
 const capPath = 'M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z';
-function applyFavicon(theme) {
+function capIconSvg(theme, radiusOverride) {
 if (theme === 'auto') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-const [c1, c2, c3, glow, glowOpacity, radius = 16] = faviconPalettes[theme] || faviconPalettes.light;
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+const [c1, c2, c3, glow, glowOpacity, paletteRadius = 16] = faviconPalettes[theme] || faviconPalettes.light;
+const radius = radiusOverride ?? paletteRadius;
+return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 <defs>
 <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></linearGradient>
 <radialGradient id="s" cx="1" cy="0" r=".75"><stop offset="0" stop-color="${glow}" stop-opacity="${glowOpacity}"/><stop offset="1" stop-color="${glow}" stop-opacity="0"/></radialGradient>
@@ -38,7 +39,9 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 <rect width="64" height="64" rx="${radius}" fill="url(#s)"/>
 <path fill="#fff" transform="translate(14 17.6) scale(.05625)" d="${capPath}"/>
 </svg>`;
-document.getElementById('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+function applyFavicon(theme) {
+document.getElementById('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(capIconSvg(theme));
 }
 if (document.documentElement.dataset.theme !== 'auto' && !(document.documentElement.dataset.theme in faviconPalettes)) {
 document.documentElement.dataset.theme = 'auto';
@@ -1338,6 +1341,27 @@ transition: transform .3s var(--ease-out);
 .ub-status:empty { display: none; }
 .ub-status.err { color: var(--danger); }
 .about > div:last-child { flex: 1; min-width: 0; }
+.icon-card { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px 6px; }
+.icon-opt {
+display: flex; flex-direction: column; align-items: center; gap: 6px;
+min-width: 0; padding: 4px 0;
+font-size: 10.5px; font-weight: 600; color: var(--muted);
+transition: transform .2s var(--ease-spring), color .2s;
+}
+.icon-opt img {
+width: 100%; max-width: 54px; aspect-ratio: 1; display: block;
+border-radius: 28%;
+box-shadow: 0 0 0 2px transparent, 0 6px 14px -8px rgba(0, 0, 0, .6);
+transition: box-shadow .2s, transform .2s var(--ease-spring);
+}
+.icon-opt span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.icon-opt:active { transform: scale(.92); }
+.icon-opt.selected { color: var(--ink); }
+.icon-opt.selected img { box-shadow: 0 0 0 2.5px var(--surface), 0 0 0 5px var(--accent); transform: scale(1.04); }
+.icon-opt img.pop { animation: pop .45s var(--ease-spring); }
+.icon-hint { margin: 0; display: flex; gap: 8px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+.icon-hint i { margin-top: 2px; }
 .app-version { display: none; flex-direction: column; align-items: stretch; gap: 8px; margin-top: 12px; }
 .app-version.show { display: flex; }
 .app-version span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
@@ -1567,6 +1591,13 @@ html.theme-switching *, html.theme-switching *::before, html.theme-switching *::
 <div class="page" style="padding-top:16px">
 <div class="section-title" style="margin-top:0"><span>Тема оформления</span><span id="theme-current" style="font-family:var(--body);font-weight:600;font-size:11.5px"></span></div>
 <div id="theme-grid" class="themes"></div>
+<div id="app-icon-section" style="display:none; flex-direction:column; gap:10px">
+<div class="section-title" style="margin-top:0"><span>Иконка приложения</span><span id="app-icon-current" style="font-family:var(--body);font-weight:600;font-size:11.5px"></span></div>
+<div class="card icon-card">
+<div id="app-icon-grid" class="icon-grid"></div>
+<p class="icon-hint"><i class="fa-solid fa-circle-info"></i>Значок на рабочем столе обновится за несколько секунд. На некоторых телефонах ярлык при смене иконки пропадает — добавьте его заново из списка приложений.</p>
+</div>
+</div>
 <div class="section-title"><span>Перенос данных</span></div>
 <div class="card data-card">
 <p class="data-hint">Задачи, ДЗ к парам и тема хранятся только на этом устройстве — у сайта и приложения они свои. Чтобы перенести их, нажмите <b>«Экспорт»</b> там, где данные уже есть, и <b>«Импорт»</b> там, куда их нужно перенести.</p>
@@ -2467,6 +2498,28 @@ function initAppVersion() {
 if (!window.AndroidApp || !AndroidApp.getAppVersion) return;
 document.getElementById('app-version').classList.add('show');
 document.getElementById('app-version-text').textContent = `Версия ${AndroidApp.getAppVersion()}`;
+initAppIcons();
+}
+function initAppIcons() {
+if (!AndroidApp.getAppIcon || !AndroidApp.setAppIcon) return;
+document.getElementById('app-icon-section').style.display = 'flex';
+renderAppIcons(AndroidApp.getAppIcon());
+}
+function renderAppIcons(current) {
+const icons = themes.filter(t => t.id !== 'auto');
+document.getElementById('app-icon-grid').innerHTML = icons.map(t => `
+<button class="icon-opt ${t.id === current ? 'selected' : ''}" data-id="${t.id}" onclick="chooseAppIcon('${t.id}')" aria-pressed="${t.id === current}">
+<img alt="" src="data:image/svg+xml,${encodeURIComponent(capIconSvg(t.id, 14))}">
+<span>${t.name}</span>
+</button>`).join('');
+const cur = icons.find(t => t.id === current);
+document.getElementById('app-icon-current').textContent = cur ? cur.name : '';
+}
+function chooseAppIcon(id) {
+if (id === AndroidApp.getAppIcon()) return;
+if (!AndroidApp.setAppIcon(id)) return;
+renderAppIcons(id);
+replay(document.querySelector(`.icon-opt[data-id="${id}"] img`), 'pop');
 }
 const EXPORT_PREFIX = 'P12:';
 let pendingImport = null;
