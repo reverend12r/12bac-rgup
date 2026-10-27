@@ -1,9 +1,9 @@
 {
-    "versionCode":  14,
-    "versionName":  "1.9",
+    "versionCode":  15,
+    "versionName":  "1.10",
     "url":  "https://raw.githubusercontent.com/reverend12r/12bac-rgup/main/app/Planner12.apk",
     "notes":  [
-                  "Новая тема «Луна» — чёрно-белый гранж с иероглифами"
+                  "Можно выбрать иконку приложения: Настройки → «Иконка приложения»"
               ],
-    "publishedAt":  "2026-10-28T02:08:39+03:00"
+    "publishedAt":  "2026-10-28T02:18:46+03:00"
 }
