@@ -18,7 +18,6 @@
         const faviconPalettes = {
             light:    ['#3a2fc4', '#5a3fe0', '#7a4ff0', '#ffb347', .55],
             dark:     ['#231c7a', '#3b2aa8', '#5a33c4', '#ff963c', .35],
-            neon:     ['#ff2bd6', '#7b2bff', '#00c8ff', '#f9f871', .35],
             aurora:   ['#0f172a', '#1e1b4b', '#134e4a', '#5eead4', .55],
             terminal: ['#021407', '#06301a', '#0a4a22', '#39ff78', .3],
             forest:   ['#0f3d2a', '#1d5a3a', '#2f7a4a', '#f0c85a', .45],
@@ -43,6 +42,11 @@
                 <path fill="#fff" transform="translate(14 17.6) scale(.05625)" d="${capPath}"/>
             </svg>`;
             document.getElementById('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+        }
+        // Сохранённая тема могла быть удалена (например, «Киберпанк») — тогда возвращаемся к «Авто»
+        if (document.documentElement.dataset.theme !== 'auto' && !(document.documentElement.dataset.theme in faviconPalettes)) {
+            document.documentElement.dataset.theme = 'auto';
+            try { localStorage.setItem('student_planner_theme', 'auto'); } catch (e) {}
         }
         applyFavicon(document.documentElement.dataset.theme);
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyFavicon(document.documentElement.dataset.theme));
@@ -192,43 +196,6 @@
                 --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 10px 30px -12px rgba(0, 0, 0, .6);
                 --shadow-lg: 0 20px 50px -18px rgba(0, 0, 0, .8);
             }
-        }
-
-        /* Киберпанк — неоновый розовый и циан на чёрно-фиолетовом */
-        [data-theme="neon"] {
-            color-scheme: dark;
-            --hero: linear-gradient(120deg, #ff2bd6 0%, #7b2bff 50%, #00c8ff 100%);
-            --hero-glow-a: rgba(249, 248, 113, .35);
-            --hero-glow-b: rgba(10, 6, 20, .35);
-            --week-b: linear-gradient(140deg, #00e5ff 0%, #39ff14 100%);
-            --tab-active-bg: linear-gradient(90deg, #ff2bd6, #7b2bff);
-            --tab-active-fg: #fff;
-            --bg: #0a0614;
-            --bg-2: #05030b;
-            --surface: #140d24;
-            --surface-2: #1d1333;
-            --ink: #f8eeff;
-            --ink-2: #dac8f2;
-            --muted: #9180b3;
-            --line: rgba(255, 60, 220, .13);
-            --line-2: rgba(255, 60, 220, .26);
-            --accent: #ff2bd6;
-            --accent-2: #00e5ff;
-            --accent-soft: rgba(255, 43, 214, .15);
-            --accent-ink: #ff9ff0;
-            --lecture: #ff4d8d;
-            --lecture-soft: rgba(255, 77, 141, .15);
-            --seminar: #00e5ff;
-            --seminar-soft: rgba(0, 229, 255, .12);
-            --sun: #f9f871;
-            --sun-soft: rgba(249, 248, 113, .1);
-            --sun-ink: #f9f871;
-            --live: #39ff14;
-            --live-soft: rgba(57, 255, 20, .12);
-            --on-live: #041400;
-            --shadow-sm: none;
-            --shadow: 0 0 0 1px rgba(255, 43, 214, .06), 0 12px 40px -14px rgba(255, 43, 214, .4);
-            --shadow-lg: 0 20px 60px -16px rgba(123, 43, 255, .7);
         }
 
         /* Терминал — зелёный фосфор и моноширинный шрифт */
@@ -701,6 +668,7 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden; /* страница никогда не листается вбок, даже если что-то шире экрана */
             overscroll-behavior: contain;
             scroll-behavior: smooth;
         }
@@ -1314,7 +1282,7 @@
         .mock-card em { width: 18px; height: 9px; border-radius: 3px; background: var(--accent); }
         .mock-card.s em { background: var(--sun); }
 
-        .about { padding: 16px; display: flex; gap: 14px; align-items: center; }
+        .about { padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
         .about-logo {
             width: 48px; height: 48px; border-radius: 15px; flex-shrink: 0;
             display: grid; place-items: center; font-size: 20px; color: #fff;
@@ -1365,10 +1333,12 @@
         .ub-status { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
         .ub-status:empty { display: none; }
         .ub-status.err { color: var(--danger); }
-        .app-version { display: none; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+        /* Версия и кнопка — отдельной строкой под текстом, кнопка на всю ширину блока */
+        .about > div:last-child { flex: 1; min-width: 0; }
+        .app-version { display: none; flex-direction: column; align-items: stretch; gap: 8px; margin-top: 12px; }
         .app-version.show { display: flex; }
-        .app-version span { font-size: 12.5px; color: var(--muted); }
-        .app-version .btn { padding: 7px 11px; font-size: 12px; }
+        .app-version span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+        .app-version .btn { justify-content: center; padding: 9px 12px; font-size: 12.5px; white-space: normal; }
 
         /* ---------- Bottom nav ---------- */
         .bottom-nav {
@@ -2470,7 +2440,6 @@
             { id: 'auto',     name: 'Авто',      icon: 'fa-circle-half-stroke', desc: 'Светлая днём, тёмная ночью — как в системе', color: '#4b3fd6' },
             { id: 'light',    name: 'Бумага',    icon: 'fa-sun',                desc: 'Тёплый кремовый и фиолетовый',             color: '#4b3fd6' },
             { id: 'dark',     name: 'Полночь',   icon: 'fa-moon',               desc: 'Глубокий тёмный с мягким индиго',           color: '#231c7a' },
-            { id: 'neon',     name: 'Киберпанк', icon: 'fa-bolt',               desc: 'Неоновый розовый и циан в темноте',         color: '#ff2bd6' },
             { id: 'aurora',   name: 'Аврора',    icon: 'fa-wand-magic-sparkles',desc: 'Северное сияние: мята и лаванда',           color: '#0f172a' },
             { id: 'terminal', name: 'Терминал',  icon: 'fa-terminal',           desc: 'Зелёный фосфор и моноширинный шрифт',       color: '#021407' },
             { id: 'forest',   name: 'Лес',       icon: 'fa-tree',               desc: 'Хвойный зелёный с золотом',                color: '#0f3d2a' },
