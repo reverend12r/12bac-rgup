@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#4b3fd6">
+    <!-- Страница сама умеет и светлую, и тёмную тему — браузеру не нужно её автоматически затемнять -->
+    <meta name="color-scheme" content="light dark">
     <title>Планер Студента — 12 Группа</title>
     <link id="favicon" rel="icon" type="image/svg+xml" href="">
     <script>
@@ -1010,11 +1012,75 @@
         .cal-day.weekend { color: var(--muted); }
         .cal-day.today { color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
         .cal-day.selected { background: var(--accent); color: var(--on-accent); box-shadow: 0 8px 18px -8px var(--accent); }
-        .cal-day .has-dot {
+        /* Метки под числом: жёлтая — есть задачи, цвета акцента — записано ДЗ к парам */
+        .cal-dots {
             position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
-            width: 5px; height: 5px; border-radius: 50%; background: var(--sun);
+            display: flex; gap: 3px;
         }
-        .cal-day.selected .has-dot { background: var(--on-accent); }
+        .cal-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--sun); }
+        .cal-dots i.hw { background: var(--accent); }
+        .cal-day.selected .cal-dots i { background: var(--on-accent); }
+        .cal-day.selected .cal-dots i.hw { opacity: .6; }
+
+        /* ---------- ДЗ к парам выбранного дня ---------- */
+        .hw-list { padding: 4px 0; }
+        .hw-row {
+            display: grid; grid-template-columns: 34px 1fr; gap: 12px;
+            padding: 12px 14px;
+        }
+        .hw-row > div { min-width: 0; }
+        .hw-row + .hw-row { border-top: 1px solid var(--line); }
+        .hw-num {
+            width: 32px; height: 32px; border-radius: 10px;
+            display: grid; place-items: center;
+            font-family: var(--display); font-weight: 600; font-size: 13px;
+            background: var(--seminar-soft); color: var(--seminar);
+        }
+        .hw-row.lec .hw-num { background: var(--lecture-soft); color: var(--lecture); }
+        .hw-title { font-weight: 700; font-size: 14px; line-height: 1.3; }
+        .hw-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+        .hw-field {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 9px; padding: 9px 11px;
+            border-radius: 11px;
+            background: var(--surface-2);
+            border: 1px solid var(--line);
+            transition: border-color .2s, background .2s, box-shadow .2s;
+        }
+        .hw-field i { font-size: 10px; color: var(--muted); }
+        .hw-field input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 13px; }
+        .hw-field input::placeholder { color: var(--muted); }
+        .hw-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); background: var(--surface); }
+        .hw-row.has-hw .hw-field { background: var(--sun-soft); border-color: color-mix(in srgb, var(--sun) 40%, transparent); }
+        .hw-row.has-hw .hw-field i { color: var(--sun); }
+        .hw-row.has-hw .hw-field input { color: var(--sun-ink); font-weight: 500; }
+        .hw-saved { font-size: 10.5px; font-weight: 700; color: var(--live); opacity: 0; transition: opacity .3s; white-space: nowrap; }
+        .hw-saved.show { opacity: 1; }
+
+        /* ---------- Перенос данных ---------- */
+        .data-card { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .data-hint { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+        .data-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .data-actions .btn { flex: 1; justify-content: center; }
+        .data-panel { display: flex; flex-direction: column; gap: 10px; animation: fade-up .3s var(--ease-out); }
+        .data-panel[hidden] { display: none; }
+        .data-panel textarea {
+            width: 100%; min-height: 84px; resize: vertical;
+            padding: 10px 12px; border-radius: 12px;
+            border: 1px solid var(--line-2); background: var(--surface-2); color: var(--ink);
+            font-family: var(--mono); font-size: 11px; line-height: 1.4; word-break: break-all;
+            outline: none;
+        }
+        .data-panel textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+        .data-status { margin: 0; font-size: 12px; font-weight: 600; min-height: 1em; }
+        .data-status.ok { color: var(--live); }
+        .data-status.err { color: var(--danger); }
+        .import-summary {
+            padding: 12px; border-radius: 12px;
+            background: var(--accent-soft); color: var(--ink); font-size: 13px; line-height: 1.5;
+        }
+        .import-summary label { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
+        .file-btn input { display: none; }
 
         .load {
             display: flex; align-items: center; gap: 12px;
@@ -1412,6 +1478,11 @@
                         </div>
                     </div>
 
+                    <div id="hw-section" style="display:flex; flex-direction:column; gap:10px">
+                        <div class="section-title" style="margin-top:0"><span>Пары и домашние задания</span><span id="hw-count" style="font-family:var(--body);font-weight:600;font-size:11.5px"></span></div>
+                        <div id="hw-list" class="card hw-list"></div>
+                    </div>
+
                     <div class="card composer">
                         <div class="composer-label">Задача на <span id="selected-date-label">выбранный день</span></div>
                         <div class="composer-row">
@@ -1429,6 +1500,33 @@
                 <div class="page" style="padding-top:16px">
                     <div class="section-title" style="margin-top:0"><span>Тема оформления</span><span id="theme-current" style="font-family:var(--body);font-weight:600;font-size:11.5px"></span></div>
                     <div id="theme-grid" class="themes"></div>
+
+                    <div class="section-title"><span>Перенос данных</span></div>
+                    <div class="card data-card">
+                        <p class="data-hint">Задачи, ДЗ к парам и тема хранятся только на этом устройстве — у сайта и приложения они свои. Чтобы перенести их, нажмите <b>«Экспорт»</b> там, где данные уже есть, и <b>«Импорт»</b> там, куда их нужно перенести.</p>
+                        <div class="data-actions">
+                            <button class="btn btn-primary" onclick="openExport()"><i class="fa-solid fa-file-export"></i>Экспорт</button>
+                            <button class="btn btn-ghost" onclick="openImport()"><i class="fa-solid fa-file-import"></i>Импорт</button>
+                        </div>
+
+                        <div id="export-panel" class="data-panel" hidden>
+                            <textarea id="export-code" readonly onclick="this.select()"></textarea>
+                            <div class="data-actions">
+                                <button class="btn btn-ghost" onclick="copyExport()"><i class="fa-regular fa-copy"></i>Скопировать код</button>
+                                <button class="btn btn-ghost" onclick="saveExportFile()"><i class="fa-solid fa-download"></i><span id="export-file-label">Скачать файл</span></button>
+                            </div>
+                            <p id="export-status" class="data-status"></p>
+                        </div>
+
+                        <div id="import-panel" class="data-panel" hidden>
+                            <textarea id="import-code" placeholder="Вставьте сюда код экспорта…" oninput="previewImport()"></textarea>
+                            <div class="data-actions">
+                                <label class="btn btn-ghost file-btn"><i class="fa-regular fa-folder-open"></i>Выбрать файл<input type="file" accept=".json,.txt,application/json,text/plain" onchange="importFromFile(this)"></label>
+                            </div>
+                            <div id="import-preview"></div>
+                            <p id="import-status" class="data-status"></p>
+                        </div>
+                    </div>
 
                     <div class="section-title"><span>О приложении</span></div>
                     <div class="card about">
@@ -1586,17 +1684,104 @@
         function saveLessonNote(key) {
             const input = document.getElementById(`note-input-${key}`);
             if (!input) return;
+            setLessonNote(key, input.value);
+            document.getElementById(`note-edit-${key}`).classList.remove('open');
+            document.getElementById(`note-view-${key}`).classList.remove('hidden');
+        }
 
-            const val = input.value.trim();
+        // Единая точка записи ДЗ к паре (ключ «ГГГГ-ММ-ДД_номерПары»):
+        // одна и та же заметка видна и в «Учёбе», и в «Задачах»
+        function setLessonNote(key, value) {
+            const val = value.trim();
+            if ((lessonNotes[key] || '') === val) return;
             if (val) lessonNotes[key] = val;
             else delete lessonNotes[key];
             saveNotes();
+            syncNoteViews(key);
+        }
 
+        function syncNoteViews(key) {
+            const val = lessonNotes[key] || '';
+
+            // «Учёба»: карточка пары, если эта неделя сейчас на экране
             const viewDiv = document.getElementById(`note-view-${key}`);
-            viewDiv.className = `note-view ${val ? 'has-note' : 'empty-note'}`;
-            viewDiv.innerHTML = noteViewInner(val).replace('__ID__', `note-text-${key}`);
+            if (viewDiv) {
+                viewDiv.className = `note-view ${val ? 'has-note' : 'empty-note'}`;
+                viewDiv.innerHTML = noteViewInner(val).replace('__ID__', `note-text-${key}`);
+                const input = document.getElementById(`note-input-${key}`);
+                if (input && input !== document.activeElement) input.value = val;
+            }
 
-            document.getElementById(`note-edit-${key}`).classList.remove('open');
+            // «Задачи»: поле ДЗ, если выбран этот день
+            const hwInput = document.getElementById(`hw-input-${key}`);
+            if (hwInput) {
+                if (hwInput !== document.activeElement) hwInput.value = val;
+                hwInput.closest('.hw-row').classList.toggle('has-hw', !!val);
+                updateHwCount();
+            }
+            renderMonthGrid();
+        }
+
+        // ---------- ДЗ к парам выбранного дня («Задачи») ----------
+        function lessonsForDate(dateStr) {
+            const date = parseLocalDate(dateStr);
+            const dow = date.getDay();
+            if (dow === 0 || dow === 6) return [];
+            return (scheduleData[getWeekTypeForDate(date)][dow] || []).slice().sort((a, b) => a.num - b.num);
+        }
+
+        function renderDayLessons() {
+            const section = document.getElementById('hw-section');
+            const lessons = lessonsForDate(selectedDateStr);
+            section.style.display = lessons.length ? 'flex' : 'none';
+            if (!lessons.length) return;
+
+            document.getElementById('hw-list').innerHTML = lessons.map(item => {
+                const bell = bells.find(b => b.num === item.num);
+                const key = `${selectedDateStr}_${item.num}`;
+                const note = lessonNotes[key] || '';
+                return `
+                    <div class="hw-row ${item.type === 'Лекция' ? 'lec' : 'sem'} ${note ? 'has-hw' : ''}">
+                        <div class="hw-num">${item.num}</div>
+                        <div>
+                            <div class="hw-title">${item.title}</div>
+                            <div class="hw-meta">${bell.start} – ${bell.end} · ${item.type} · Ауд. ${item.room}</div>
+                            <label class="hw-field">
+                                <i class="fa-solid ${note ? 'fa-thumbtack' : 'fa-pen'}"></i>
+                                <input id="hw-input-${key}" type="text" value="${escapeHtml(note)}" placeholder="Записать ДЗ или дедлайн…"
+                                    oninput="queueHwSave('${key}', this)" onblur="flushHwSave('${key}', this)"
+                                    onkeydown="if(event.key === 'Enter') this.blur()">
+                                <span class="hw-saved" id="hw-saved-${key}">Сохранено</span>
+                            </label>
+                        </div>
+                    </div>`;
+            }).join('');
+            updateHwCount();
+        }
+
+        function updateHwCount() {
+            const lessons = lessonsForDate(selectedDateStr);
+            const filled = lessons.filter(l => lessonNotes[`${selectedDateStr}_${l.num}`]).length;
+            document.getElementById('hw-count').textContent = lessons.length ? `ДЗ: ${filled} из ${lessons.length}` : '';
+        }
+
+        // Пишем с небольшой паузой после ввода, чтобы не сохранять на каждую букву
+        const hwTimers = {};
+        function queueHwSave(key, input) {
+            clearTimeout(hwTimers[key]);
+            input.closest('.hw-row').classList.toggle('has-hw', !!input.value.trim());
+            hwTimers[key] = setTimeout(() => flushHwSave(key, input), 500);
+        }
+        function flushHwSave(key, input) {
+            clearTimeout(hwTimers[key]);
+            const changed = (lessonNotes[key] || '') !== input.value.trim();
+            setLessonNote(key, input.value);
+            const icon = input.parentElement.querySelector('i');
+            if (icon) icon.className = `fa-solid ${input.value.trim() ? 'fa-thumbtack' : 'fa-pen'}`;
+            if (changed) {
+                const badge = document.getElementById(`hw-saved-${key}`);
+                if (badge) { badge.classList.add('show'); setTimeout(() => badge.classList.remove('show'), 1200); }
+            }
         }
 
         function getTargetWeekDate() {
@@ -1683,6 +1868,7 @@
             renderMonthGrid();
             document.getElementById('selected-date-label').innerText = parseLocalDate(selectedDateStr).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
             updateStudyBannerForDate(selectedDateStr);
+            renderDayLessons();
             renderTasks();
         }
 
@@ -1697,6 +1883,7 @@
             const totalDays = new Date(year, month + 1, 0).getDate();
             const todayStr = formatDateISO(new Date());
 
+            const hwDates = new Set(Object.keys(lessonNotes).map(k => k.slice(0, 10)));
             let html = '';
             for (let i = 0; i < firstDayIndex; i++) html += `<div></div>`;
 
@@ -1708,8 +1895,9 @@
                 if (dStr === todayStr) cls.push('today');
                 if (dStr === selectedDateStr) cls.push('selected');
                 const hasTasks = tasks.some(t => t.date === dStr && !t.done);
+                const dots = (hasTasks ? '<i></i>' : '') + (hwDates.has(dStr) ? '<i class="hw"></i>' : '');
 
-                html += `<button class="${cls.join(' ')}" onclick="selectCalendarDate('${dStr}')">${day}${hasTasks ? '<span class="has-dot"></span>' : ''}</button>`;
+                html += `<button class="${cls.join(' ')}" onclick="selectCalendarDate('${dStr}')">${day}${dots ? `<span class="cal-dots">${dots}</span>` : ''}</button>`;
             }
             grid.innerHTML = html;
         }
@@ -2242,6 +2430,197 @@
                 animateChildren(document.getElementById('content-' + tab));
                 if (tab === 'bells') animateChildren(document.getElementById('bells-list'));
             }
+        }
+
+        // ---------- Перенос данных между сайтом и приложением ----------
+        // У сайта и приложения разные хранилища, поэтому данные переносятся кодом или файлом.
+        const EXPORT_PREFIX = 'P12:';
+        let pendingImport = null;
+        let replaceArmed = false;
+
+        function plural(n, one, few, many) {
+            const m10 = n % 10, m100 = n % 100;
+            if (m10 === 1 && m100 !== 11) return `${n} ${one}`;
+            if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return `${n} ${few}`;
+            return `${n} ${many}`;
+        }
+
+        function encodeExport() {
+            const data = { app: 'planner12', version: 1, exportedAt: new Date().toISOString(), tasks, lessonNotes, theme: getTheme() };
+            const bytes = new TextEncoder().encode(JSON.stringify(data));
+            let bin = '';
+            bytes.forEach(b => bin += String.fromCharCode(b));
+            return EXPORT_PREFIX + btoa(bin);
+        }
+
+        // Принимает и код «P12:…», и содержимое JSON-файла. Всё лишнее отбрасывает.
+        function decodeImport(text) {
+            text = text.trim();
+            let json = text;
+            if (!text.startsWith('{')) {
+                const bin = atob(text.replace(/^P12:/, '').replace(/\s+/g, ''));
+                json = new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+            }
+            const d = JSON.parse(json);
+            if (!d || d.app !== 'planner12') throw new Error('not planner data');
+
+            const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+            const base = Date.now();
+            const importedTasks = (Array.isArray(d.tasks) ? d.tasks : [])
+                .filter(t => t && typeof t.text === 'string' && t.text.trim() && dateRe.test(t.date))
+                .map((t, i) => ({ id: Number.isSafeInteger(t.id) ? t.id : base + i, text: t.text.slice(0, 500), date: t.date, done: !!t.done }));
+            const importedNotes = {};
+            if (d.lessonNotes && typeof d.lessonNotes === 'object') {
+                for (const [k, v] of Object.entries(d.lessonNotes)) {
+                    if (/^\d{4}-\d{2}-\d{2}_\d$/.test(k) && typeof v === 'string' && v.trim()) importedNotes[k] = v.slice(0, 1000);
+                }
+            }
+            return {
+                tasks: importedTasks,
+                lessonNotes: importedNotes,
+                theme: themes.some(t => t.id === d.theme) ? d.theme : null,
+                exportedAt: d.exportedAt
+            };
+        }
+
+        function setStatus(id, text, kind) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.className = 'data-status' + (kind ? ' ' + kind : '');
+        }
+
+        function openExport() {
+            document.getElementById('import-panel').hidden = true;
+            document.getElementById('export-panel').hidden = false;
+            document.getElementById('export-code').value = encodeExport();
+            document.getElementById('export-file-label').textContent = window.AndroidApp ? 'Поделиться' : 'Скачать файл';
+            setStatus('export-status', `В коде: ${plural(tasks.length, 'задача', 'задачи', 'задач')} и ${plural(Object.keys(lessonNotes).length, 'запись', 'записи', 'записей')} ДЗ.`);
+        }
+
+        async function copyExport() {
+            const area = document.getElementById('export-code');
+            const code = area.value;
+            try {
+                if (window.AndroidApp && AndroidApp.copyText) AndroidApp.copyText(code);
+                else if (navigator.clipboard) await navigator.clipboard.writeText(code);
+                else throw new Error('no clipboard');
+            } catch (e) {
+                area.select();
+                document.execCommand('copy');
+            }
+            setStatus('export-status', 'Код скопирован. Откройте «Импорт» на другом устройстве и вставьте его.', 'ok');
+        }
+
+        function saveExportFile() {
+            const code = document.getElementById('export-code').value;
+            if (window.AndroidApp && AndroidApp.shareText) {
+                AndroidApp.shareText('Планер — экспорт данных', code);
+                return;
+            }
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `planner12-${formatDateISO(new Date())}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            setStatus('export-status', 'Файл сохранён в «Загрузки».', 'ok');
+        }
+
+        function openImport() {
+            document.getElementById('export-panel').hidden = true;
+            document.getElementById('import-panel').hidden = false;
+            document.getElementById('import-code').value = '';
+            document.getElementById('import-preview').innerHTML = '';
+            setStatus('import-status', '');
+            pendingImport = null;
+        }
+
+        function importFromFile(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('import-code').value = String(reader.result || '');
+                previewImport();
+            };
+            reader.onerror = () => setStatus('import-status', 'Не удалось прочитать файл.', 'err');
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function previewImport() {
+            const text = document.getElementById('import-code').value;
+            const preview = document.getElementById('import-preview');
+            pendingImport = null;
+            replaceArmed = false;
+            setStatus('import-status', '');
+            if (!text.trim()) { preview.innerHTML = ''; return; }
+            try {
+                pendingImport = decodeImport(text);
+            } catch (e) {
+                preview.innerHTML = '';
+                setStatus('import-status', 'Это не похоже на код экспорта планера. Скопируйте его целиком.', 'err');
+                return;
+            }
+            const p = pendingImport;
+            const newTasks = p.tasks.filter(t => !tasks.some(x => x.id === t.id)).length;
+            const when = p.exportedAt ? new Date(p.exportedAt) : null;
+            const themeName = p.theme ? themes.find(t => t.id === p.theme).name : '';
+            preview.innerHTML = `
+                <div class="import-summary">
+                    Найдено: <b>${plural(p.tasks.length, 'задача', 'задачи', 'задач')}</b> (новых — ${newTasks})
+                    и <b>${plural(Object.keys(p.lessonNotes).length, 'запись', 'записи', 'записей')} ДЗ</b>${when && !isNaN(when) ? `, экспорт от ${when.toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}` : ''}.
+                    ${p.theme ? `<label><input type="checkbox" id="import-theme" checked> Применить тему «${themeName}»</label>` : ''}
+                </div>
+                <div class="data-actions" style="margin-top:10px">
+                    <button class="btn btn-primary" onclick="applyImport('merge')"><i class="fa-solid fa-code-merge"></i>Добавить к моим</button>
+                    <button class="btn btn-ghost" id="replace-btn" onclick="applyImport('replace')"><i class="fa-solid fa-rotate"></i>Заменить всё</button>
+                </div>`;
+        }
+
+        function applyImport(mode) {
+            const p = pendingImport;
+            if (!p) return;
+
+            if (mode === 'replace' && !replaceArmed) {
+                // Замена стирает текущие данные — просим второе нажатие
+                replaceArmed = true;
+                document.getElementById('replace-btn').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>Нажмите ещё раз';
+                setTimeout(() => {
+                    replaceArmed = false;
+                    const btn = document.getElementById('replace-btn');
+                    if (btn) btn.innerHTML = '<i class="fa-solid fa-rotate"></i>Заменить всё';
+                }, 3000);
+                return;
+            }
+
+            if (mode === 'replace') {
+                tasks = p.tasks.slice();
+                lessonNotes = { ...p.lessonNotes };
+            } else {
+                // Объединение без потерь: новые задачи добавляем, а если у пары
+                // уже есть другая заметка — сохраняем обе через « · »
+                p.tasks.forEach(t => { if (!tasks.some(x => x.id === t.id)) tasks.push(t); });
+                for (const [k, v] of Object.entries(p.lessonNotes)) {
+                    const mine = lessonNotes[k];
+                    lessonNotes[k] = !mine || mine === v || mine.includes(v) ? (mine || v) : `${mine} · ${v}`;
+                }
+            }
+            saveTasks();
+            saveNotes();
+            const themeBox = document.getElementById('import-theme');
+            if (p.theme && themeBox && themeBox.checked) applyTheme(p.theme);
+
+            renderFullWeekSchedule();
+            updateClockAndLiveStatus();
+            renderCalendar();
+
+            document.getElementById('import-code').value = '';
+            document.getElementById('import-preview').innerHTML = '';
+            pendingImport = null;
+            setStatus('import-status', `Готово: ${mode === 'replace' ? 'данные заменены' : 'данные добавлены'}. Сейчас ${plural(tasks.length, 'задача', 'задачи', 'задач')} и ${plural(Object.keys(lessonNotes).length, 'запись', 'записи', 'записей')} ДЗ.`, 'ok');
         }
 
         function retryEmbed() {
