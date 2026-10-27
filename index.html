@@ -24,20 +24,22 @@
             forest:   ['#0f3d2a', '#1d5a3a', '#2f7a4a', '#f0c85a', .45],
             sunset:   ['#ff5e62', '#ff7a59', '#ffb347', '#fff096', .5],
             ocean:    ['#023e8a', '#0077b6', '#00b4d8', '#90e0ef', .55],
-            sakura:   ['#f78fb3', '#e86a9a', '#b46ad8', '#ffffff', .45]
+            sakura:   ['#f78fb3', '#e86a9a', '#b46ad8', '#ffffff', .45],
+            mitten:   ['#0b0b0b', '#0b0b0b', '#0b0b0b', '#ffffff', 0, 0]
         };
         // Иконка graduation-cap из Font Awesome Free 6.4.0 (CC BY 4.0), сетка 640×512
         const capPath = 'M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z';
         function applyFavicon(theme) {
             if (theme === 'auto') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            const [c1, c2, c3, glow, glowOpacity] = faviconPalettes[theme] || faviconPalettes.light;
+            // Шестой элемент — скругление углов (по умолчанию 16; у «Пикселя» углы квадратные)
+            const [c1, c2, c3, glow, glowOpacity, radius = 16] = faviconPalettes[theme] || faviconPalettes.light;
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                 <defs>
                     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></linearGradient>
                     <radialGradient id="s" cx="1" cy="0" r=".75"><stop offset="0" stop-color="${glow}" stop-opacity="${glowOpacity}"/><stop offset="1" stop-color="${glow}" stop-opacity="0"/></radialGradient>
                 </defs>
-                <rect width="64" height="64" rx="16" fill="url(#g)"/>
-                <rect width="64" height="64" rx="16" fill="url(#s)"/>
+                <rect width="64" height="64" rx="${radius}" fill="url(#g)"/>
+                <rect width="64" height="64" rx="${radius}" fill="url(#s)"/>
                 <path fill="#fff" transform="translate(14 17.6) scale(.05625)" d="${capPath}"/>
             </svg>`;
             document.getElementById('favicon').href = 'data:image/svg+xml,' + encodeURIComponent(svg);
@@ -47,7 +49,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ---------- Themes ----------
@@ -442,6 +444,88 @@
             --live: #3aa36b;
             --live-soft: #def4e7;
             --shadow-lg: 0 20px 50px -18px rgba(214, 69, 122, .5);
+        }
+
+        /* Пиксель — по мотивам Scrolltide «Mitten»: монохром, пиксельный шрифт,
+           квадратные углы и сканлайны вместо мягких теней и градиентов */
+        [data-theme="mitten"] {
+            color-scheme: light;
+            --display: 'Press Start 2P', 'JetBrains Mono', monospace;
+            --body: 'JetBrains Mono', ui-monospace, monospace;
+            --hero: linear-gradient(180deg, #f4f3f0 0%, #e2e1dd 100%);
+            --hero-glow-a: rgba(0, 0, 0, 0);
+            --hero-glow-b: rgba(0, 0, 0, 0);
+            --week-b: repeating-linear-gradient(0deg, #0b0b0b 0 3px, #5a5a57 3px 4px);
+            --tab-active-bg: #0b0b0b;
+            --tab-active-fg: #f6f5f2;
+            --on-accent: #f6f5f2;
+            --on-live: #f6f5f2;
+            --bg: #ecebe8;
+            --bg-2: #dddcd8;
+            --surface: #f7f6f3;
+            --surface-2: #e8e7e3;
+            --ink: #0b0b0b;
+            --ink-2: #2a2a28;
+            --muted: #6f6e6a;
+            --line: rgba(0, 0, 0, .13);
+            --line-2: rgba(0, 0, 0, .3);
+            --accent: #0b0b0b;
+            --accent-2: #3d3d3a;
+            --accent-soft: rgba(0, 0, 0, .08);
+            --accent-ink: #000;
+            --lecture: #0b0b0b;
+            --lecture-soft: rgba(0, 0, 0, .1);
+            --seminar: #5d5c58;
+            --seminar-soft: rgba(0, 0, 0, .05);
+            --sun: #b9b8b2;
+            --sun-soft: #e3e2dd;
+            --sun-ink: #141414;
+            --live: #0b0b0b;
+            --live-soft: rgba(0, 0, 0, .07);
+            --shadow-sm: none;
+            --shadow: none;
+            --shadow-lg: none;
+            --r-lg: 0px;
+            --r-md: 0px;
+            --r-sm: 0px;
+        }
+        /* Всё квадратное, как пиксели (точки и индикаторы тоже) */
+        :root[data-theme="mitten"] *, :root[data-theme="mitten"] *::before, :root[data-theme="mitten"] *::after,
+        .mock[data-theme="mitten"], .mock[data-theme="mitten"] * { border-radius: 0 !important; }
+        [data-theme="mitten"] .card { border-color: var(--line-2); }
+        [data-theme="mitten"] .header {
+            color: #0b0b0b;
+            border-bottom: 1px solid rgba(0, 0, 0, .25);
+        }
+        /* «Призрак» из сканлайнов в правой части шапки */
+        [data-theme="mitten"] .header::after {
+            background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, .75) 0 2px, transparent 2px 5px);
+            background-size: auto;
+            -webkit-mask-image: radial-gradient(46% 150% at 90% 45%, #000 0%, rgba(0, 0, 0, .5) 40%, transparent 72%);
+            mask-image: radial-gradient(46% 150% at 90% 45%, #000 0%, rgba(0, 0, 0, .5) 40%, transparent 72%);
+            opacity: .8;
+        }
+        [data-theme="mitten"] .header h1 { font-size: 20px; line-height: 1.35; letter-spacing: 0; }
+        [data-theme="mitten"] .eyebrow { opacity: .7; }
+        [data-theme="mitten"] .eyebrow .dot { background: #0b0b0b; box-shadow: none; }
+        [data-theme="mitten"] .clock { background: rgba(255, 255, 255, .55); border-color: rgba(0, 0, 0, .25); }
+        [data-theme="mitten"] .week-letter { font-size: 20px; box-shadow: none; }
+        [data-theme="mitten"] .week-name, [data-theme="mitten"] .day-title h3 { font-size: 12px; line-height: 1.5; }
+        [data-theme="mitten"] .cal-head h2 { font-size: 13px; }
+        [data-theme="mitten"] .now-big { font-size: 17px; }
+        [data-theme="mitten"] .daychip .dd { font-size: 14px; margin: 7px 0 8px; }
+        [data-theme="mitten"] .section-title { font-size: 9px; letter-spacing: .04em; line-height: 1.6; }
+        [data-theme="mitten"] .lesson-num, [data-theme="mitten"] .bell-num, [data-theme="mitten"] .hw-num { font-size: 11px; }
+        /* Полоски прогресса — сегментами, как дискретный сигнал */
+        [data-theme="mitten"] .now-progress > span { background: repeating-linear-gradient(90deg, #0b0b0b 0 6px, transparent 6px 8px); }
+        [data-theme="mitten"] .bell-fill { background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .09) 0 2px, transparent 2px 4px); }
+        [data-theme="mitten"] .about-logo { color: #f6f5f2; background: #0b0b0b; }
+        [data-theme="mitten"] .nav-ink, [data-theme="mitten"] .add-btn, [data-theme="mitten"] .btn-primary,
+        [data-theme="mitten"] .cal-day.selected { box-shadow: none; }
+        .mock[data-theme="mitten"] .mock-hero i { background: rgba(0, 0, 0, .35); }
+        .mock[data-theme="mitten"] .mock-hero i + i { background: #0b0b0b; }
+        .mock[data-theme="mitten"] .mock-hero {
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .14) 0 1px, transparent 1px 3px), var(--hero);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1241,6 +1325,51 @@
         .about h3 { margin: 0; font-family: var(--display); font-size: 14px; font-weight: 600; }
         .about p { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 
+        /* ---------- Баннер обновления (только в приложении) ---------- */
+        .update-banner {
+            position: absolute; z-index: 40;
+            left: 12px; right: 12px; bottom: calc(86px + env(safe-area-inset-bottom));
+            max-width: 520px; margin: 0 auto;
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 14px;
+            background: var(--surface);
+            border: 1px solid var(--line-2);
+            border-radius: var(--r-lg);
+            box-shadow: 0 24px 60px -18px rgba(0, 0, 0, .45);
+            animation: banner-in .55s var(--ease-spring) both;
+        }
+        .update-banner[hidden] { display: none; }
+        .update-banner.leaving { animation: banner-out .3s ease-in forwards; }
+        @keyframes banner-in { from { opacity: 0; transform: translateY(30px) scale(.96); } to { opacity: 1; transform: none; } }
+        @keyframes banner-out { to { opacity: 0; transform: translateY(24px) scale(.97); } }
+        .ub-icon {
+            width: 42px; height: 42px; flex-shrink: 0; border-radius: 13px;
+            display: grid; place-items: center; font-size: 17px;
+            background: var(--accent); color: var(--on-accent);
+        }
+        .ub-body { flex: 1; min-width: 0; }
+        .ub-title { font-family: var(--display); font-weight: 600; font-size: 14px; line-height: 1.35; }
+        .ub-notes { margin: 6px 0 0; padding-left: 16px; font-size: 12.5px; color: var(--ink-2); line-height: 1.45; }
+        .ub-notes:empty { display: none; }
+        .ub-progress { margin-top: 10px; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+        .ub-progress[hidden] { display: none; }
+        .ub-progress > span {
+            display: block; height: 100%; width: 100%;
+            background: var(--accent);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform .3s var(--ease-out);
+        }
+        .ub-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .ub-actions .btn { flex: 1; justify-content: center; }
+        .ub-actions .btn:disabled { opacity: .7; pointer-events: none; }
+        .ub-status { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+        .ub-status:empty { display: none; }
+        .ub-status.err { color: var(--danger); }
+        .app-version { display: none; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+        .app-version.show { display: flex; }
+        .app-version span { font-size: 12.5px; color: var(--muted); }
+        .app-version .btn { padding: 7px 11px; font-size: 12px; }
+
         /* ---------- Bottom nav ---------- */
         .bottom-nav {
             flex-shrink: 0;
@@ -1534,11 +1663,29 @@
                         <div>
                             <h3>Планер студента</h3>
                             <p>12 группа · КФ РГУП. Задачи, заметки и выбранная тема хранятся только на этом устройстве.</p>
+                            <div id="app-version" class="app-version">
+                                <span id="app-version-text"></span>
+                                <button class="btn btn-ghost" onclick="checkUpdatesManually()"><i class="fa-solid fa-rotate"></i>Проверить обновления</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
+
+        <div id="update-banner" class="update-banner" hidden role="dialog" aria-label="Обновление приложения">
+            <div class="ub-icon"><i class="fa-solid fa-rocket"></i></div>
+            <div class="ub-body">
+                <div class="ub-title">Доступно обновление <span id="ub-version"></span></div>
+                <ul id="ub-notes" class="ub-notes"></ul>
+                <div id="ub-progress" class="ub-progress" hidden><span></span></div>
+                <div class="ub-actions">
+                    <button id="ub-install" class="btn btn-primary" onclick="installUpdate()"><i class="fa-solid fa-download"></i>Установить</button>
+                    <button id="ub-later" class="btn btn-ghost" onclick="dismissUpdate()">Позже</button>
+                </div>
+                <div id="ub-status" class="ub-status"></div>
+            </div>
+        </div>
 
         <nav class="bottom-nav">
             <div class="inner">
@@ -2027,6 +2174,7 @@
             renderBells();
             renderCalendar();
             setTheme(getTheme());
+            initAppVersion();
 
             setInterval(updateClockAndLiveStatus, 1000);
             updateClockAndLiveStatus();
@@ -2328,7 +2476,8 @@
             { id: 'forest',   name: 'Лес',       icon: 'fa-tree',               desc: 'Хвойный зелёный с золотом',                color: '#0f3d2a' },
             { id: 'sunset',   name: 'Закат',     icon: 'fa-cloud-sun',          desc: 'Персик, коралл и слива',                   color: '#ff5e62' },
             { id: 'ocean',    name: 'Океан',     icon: 'fa-water',              desc: 'Глубокий синий и бирюза',                  color: '#0077b6' },
-            { id: 'sakura',   name: 'Сакура',    icon: 'fa-spa',                desc: 'Нежно-розовый и лаванда',                  color: '#e86a9a' }
+            { id: 'sakura',   name: 'Сакура',    icon: 'fa-spa',                desc: 'Нежно-розовый и лаванда',                  color: '#e86a9a' },
+            { id: 'mitten',   name: 'Пиксель',   icon: 'fa-chess-board',        desc: 'Монохром, пиксельный шрифт и сканлайны',     color: '#0b0b0b' }
         ];
 
         function getTheme() { return document.documentElement.dataset.theme || 'auto'; }
@@ -2430,6 +2579,95 @@
                 animateChildren(document.getElementById('content-' + tab));
                 if (tab === 'bells') animateChildren(document.getElementById('bells-list'));
             }
+        }
+
+        // ---------- Обновления приложения ----------
+        // Проверку и установку делает Android-часть (window.AndroidApp); она вызывает эти функции.
+        // На сайте AndroidApp нет — баннер никогда не появляется.
+        const ubInstallLabel = '<i class="fa-solid fa-download"></i>Установить';
+
+        function setUpdateStatus(text, isError) {
+            const el = document.getElementById('ub-status');
+            el.textContent = text;
+            el.classList.toggle('err', !!isError);
+        }
+
+        window.onUpdateAvailable = function (info) {
+            const banner = document.getElementById('update-banner');
+            document.getElementById('ub-version').textContent = info.versionName || '';
+            const notes = Array.isArray(info.notes) ? info.notes.slice(0, 4) : [];
+            document.getElementById('ub-notes').innerHTML = notes.map(n => `<li>${escapeHtml(String(n))}</li>`).join('');
+            document.getElementById('ub-progress').hidden = true;
+            const btn = document.getElementById('ub-install');
+            btn.disabled = false;
+            btn.innerHTML = ubInstallLabel;
+            setUpdateStatus('');
+            banner.classList.remove('leaving');
+            banner.hidden = false;
+            setIfChanged(document.getElementById('app-version-text'), 'textContent',
+                `Версия ${AndroidApp.getAppVersion()} · доступна ${info.versionName}`);
+        };
+
+        window.onUpdateProgress = function (pct, phase) {
+            const bar = document.getElementById('ub-progress');
+            bar.hidden = false;
+            bar.firstElementChild.style.transform = `scaleX(${pct / 100})`;
+            document.getElementById('ub-install').innerHTML = phase === 'install'
+                ? '<i class="fa-solid fa-gear fa-spin"></i>Установка…'
+                : `<i class="fa-solid fa-arrow-down"></i>Загрузка ${pct}%`;
+        };
+
+        window.onUpdateError = function (kind) {
+            const messages = {
+                check: 'Не удалось проверить обновления. Проверьте интернет.',
+                download: 'Не удалось скачать обновление. Проверьте интернет и попробуйте ещё раз.',
+                aborted: 'Установка отменена. Можно попробовать снова.',
+                install: 'Не удалось установить обновление.'
+            };
+            if (kind === 'check') {
+                setIfChanged(document.getElementById('app-version-text'), 'textContent', messages.check);
+                return;
+            }
+            const btn = document.getElementById('ub-install');
+            btn.disabled = false;
+            btn.innerHTML = ubInstallLabel;
+            document.getElementById('ub-progress').hidden = true;
+            setUpdateStatus(messages[kind] || messages.install, true);
+        };
+
+        window.onUpdateNeedsPermission = function () {
+            setUpdateStatus('Разрешите приложению устанавливать обновления в открывшихся настройках, затем вернитесь и нажмите «Установить» ещё раз.');
+        };
+
+        window.onUpdateNone = function () {
+            document.getElementById('app-version-text').textContent = `Версия ${AndroidApp.getAppVersion()} — последняя`;
+        };
+
+        function installUpdate() {
+            if (!window.AndroidApp || !AndroidApp.installUpdate) return;
+            const btn = document.getElementById('ub-install');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-arrow-down"></i>Загрузка…';
+            setUpdateStatus('');
+            AndroidApp.installUpdate();
+        }
+
+        function dismissUpdate() {
+            const banner = document.getElementById('update-banner');
+            banner.classList.add('leaving');
+            banner.addEventListener('animationend', () => { banner.hidden = true; banner.classList.remove('leaving'); }, { once: true });
+        }
+
+        function checkUpdatesManually() {
+            if (!window.AndroidApp || !AndroidApp.checkForUpdates) return;
+            document.getElementById('app-version-text').textContent = 'Проверяю…';
+            AndroidApp.checkForUpdates();
+        }
+
+        function initAppVersion() {
+            if (!window.AndroidApp || !AndroidApp.getAppVersion) return;
+            document.getElementById('app-version').classList.add('show');
+            document.getElementById('app-version-text').textContent = `Версия ${AndroidApp.getAppVersion()}`;
         }
 
         // ---------- Перенос данных между сайтом и приложением ----------
