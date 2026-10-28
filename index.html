@@ -1112,6 +1112,7 @@ var(--hero);
 }
 .mock[data-theme="hallow"] .mock-hero i + i { background: linear-gradient(90deg, #b8893f, #f6e2a8, #9c7330); }
 .theme-card[data-id="hallow"] { border-color: rgba(201, 163, 90, .45); }
+.theme-card[data-id="hallow"] .theme-name { flex-wrap: wrap; row-gap: 4px; }
 .theme-card[data-id="hallow"] .theme-name::after {
 content: "флагман"; margin-left: auto;
 padding: 2px 8px; border-radius: 99px;
@@ -1897,12 +1898,13 @@ transition: background-size .4s var(--ease-out);
 .task .del:hover { opacity: 1; color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
 .themes {
 display: grid;
-grid-template-columns: repeat(2, 1fr);
+grid-template-columns: repeat(2, minmax(0, 1fr));
 gap: 12px;
 }
-@media (min-width: 620px) { .themes { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 620px) { .themes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .theme-card {
 position: relative;
+min-width: 0;
 text-align: left;
 padding: 8px 8px 12px;
 border-radius: 20px;
